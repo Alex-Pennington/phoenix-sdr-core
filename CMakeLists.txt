@@ -49,7 +49,7 @@ else()
     if(REQUIRE_SDRPLAY)
         message(FATAL_ERROR "SDRplay API not found. Install from https://www.sdrplay.com/downloads/")
     else()
-        message(WARNING "SDRplay API not found - building stub version for CI")
+        message(WARNING "SDRplay API not found - building library in stub mode for CI")
         message(STATUS "Install SDRplay API from https://www.sdrplay.com/downloads/")
     endif()
 endif()
@@ -143,28 +143,6 @@ else()
 endif()
 
 #============================================================================
-# Executables
-#============================================================================
-
-# Main SDR server (only if SDRplay API available)
-if(SDRplayAPI_FOUND)
-    add_executable(sdr_server src/main.c)
-    target_link_libraries(sdr_server PRIVATE phoenix_sdr_core)
-    
-    # Copy DLL to output (Windows)
-    if(WIN32 AND SDRplayAPI_DLL)
-        add_custom_command(TARGET sdr_server POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${SDRplayAPI_DLL}"
-                "$<TARGET_FILE_DIR:sdr_server>"
-            COMMENT "Copying sdrplay_api.dll"
-        )
-    endif()
-    
-    install(TARGETS sdr_server RUNTIME DESTINATION bin)
-endif()
-
-#============================================================================
 # Tests
 #============================================================================
 
@@ -208,4 +186,6 @@ message(STATUS "Phoenix SDR Core v${PROJECT_VERSION}")
 message(STATUS "  SDRplay API: ${SDRplayAPI_FOUND}")
 message(STATUS "  Build tests: ${BUILD_TESTS}")
 message(STATUS "  Git commit:  ${GIT_COMMIT}${GIT_DIRTY_STR}")
+message(STATUS "")
+message(STATUS "This is a LIBRARY. Full applications are in phoenix-sdr-utils.")
 message(STATUS "")

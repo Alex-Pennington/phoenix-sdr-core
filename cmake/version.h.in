@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 
-static inline void phoenix_print_version(const char *tool_name) {
+static inline void print_version(const char *tool_name) {
     printf("%s v%s (built %s %s)\n",
            tool_name, PHOENIX_VERSION_FULL,
            PHOENIX_BUILD_DATE, PHOENIX_BUILD_TIME);

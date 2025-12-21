@@ -102,6 +102,11 @@
             "output": {"outputOnFailure": true}
         },
         {
+            "name": "msys2-ucrt64",
+            "configurePreset": "msys2-ucrt64",
+            "output": {"outputOnFailure": true}
+        },
+        {
             "name": "ci-windows",
             "configurePreset": "ci-windows",
             "output": {"outputOnFailure": true}
