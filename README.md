@@ -24,6 +24,78 @@ This is the **foundation layer** that other Phoenix SDR tools build upon.
 
 ---
 
+## Prerequisites
+
+### SDRplay API (Required for full build)
+
+Download and install the SDRplay API v3.x from:
+**https://www.sdrplay.com/api/**
+
+The installer places files in `C:\Program Files\SDRplay\API\` on Windows.
+
+### Build Tools
+
+**Windows (MSYS2 UCRT64 — Recommended):**
+
+```bash
+# Install MSYS2 from https://www.msys2.org/
+# Open UCRT64 shell, then:
+pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja mingw-w64-ucrt-x86_64-gcc
+```
+
+**Linux:**
+
+```bash
+sudo apt install cmake ninja-build gcc
+```
+
+---
+
+## Building
+
+### Clone with Submodules
+
+```bash
+git clone --recurse-submodules https://github.com/Alex-Pennington/phoenix-sdr-core.git
+cd phoenix-sdr-core
+```
+
+### Build with CMake
+
+**MSYS2 UCRT64 (Windows):**
+
+```bash
+cmake --preset msys2-ucrt64
+cmake --build --preset msys2-ucrt64
+```
+
+**Generic Debug/Release:**
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+### Run Tests
+
+```bash
+ctest --preset msys2-ucrt64 --output-on-failure
+```
+
+### Build Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `BUILD_TESTS` | ON | Build unit tests |
+| `REQUIRE_SDRPLAY` | OFF | Fail if SDRplay API not found |
+
+```bash
+# Example: Require SDRplay API
+cmake -B build -DREQUIRE_SDRPLAY=ON
+```
+
+---
+
 ## Architecture
 
 ```
@@ -42,48 +114,6 @@ This is the **foundation layer** that other Phoenix SDR tools build upon.
 │                    └─────────────┘                       │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
-```
-
----
-
-## Dependencies
-
-### Required
-
-- **SDRplay API v3.x** — Download from [sdrplay.com](https://www.sdrplay.com/api/)
-- **kiss_fft** — FFT library (git submodule)
-
-### Build Tools
-
-- Windows: MinGW-w64 or MSVC
-- PowerShell 5.1+ for build script
-
----
-
-## Building
-
-### Quick Build
-
-```powershell
-.\build.ps1
-```
-
-### Build Options
-
-```powershell
-.\build.ps1 -Release          # Release build with optimizations
-.\build.ps1 -Clean            # Clean before build
-.\build.ps1 -Target server    # Build only the SDR server
-```
-
-### First-time Setup
-
-```powershell
-# Clone with submodules
-git clone --recurse-submodules https://github.com/Alex-Pennington/phoenix-sdr-core.git
-
-# Or if already cloned:
-git submodule update --init --recursive
 ```
 
 ---
@@ -203,6 +233,16 @@ int main() {
     return 0;
 }
 ```
+
+---
+
+## CI/CD
+
+This repository uses GitHub Actions for continuous integration. Builds are tested on:
+- Windows (MSYS2 UCRT64)
+- Linux (GCC)
+
+**Note:** CI builds without the SDRplay API (stub mode). Full functionality requires user-installed SDRplay API.
 
 ---
 

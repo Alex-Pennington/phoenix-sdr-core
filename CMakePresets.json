@@ -1,0 +1,115 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 16,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}"
+        },
+        {
+            "name": "debug",
+            "inherits": "base",
+            "displayName": "Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "base",
+            "displayName": "Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "msys2-ucrt64",
+            "inherits": "base",
+            "displayName": "MSYS2 UCRT64",
+            "description": "Build with MSYS2 UCRT64 toolchain",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "ci-windows",
+            "inherits": "base",
+            "displayName": "CI Windows (no SDRplay)",
+            "description": "GitHub Actions Windows build without SDRplay API",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "REQUIRE_SDRPLAY": "OFF",
+                "BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "ci-linux",
+            "inherits": "base",
+            "displayName": "CI Linux (no SDRplay)",
+            "description": "GitHub Actions Linux build without SDRplay API",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "REQUIRE_SDRPLAY": "OFF",
+                "BUILD_TESTS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "msys2-ucrt64",
+            "configurePreset": "msys2-ucrt64"
+        },
+        {
+            "name": "ci-windows",
+            "configurePreset": "ci-windows"
+        },
+        {
+            "name": "ci-linux",
+            "configurePreset": "ci-linux"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug",
+            "output": {"outputOnFailure": true}
+        },
+        {
+            "name": "release",
+            "configurePreset": "release",
+            "output": {"outputOnFailure": true}
+        },
+        {
+            "name": "ci-windows",
+            "configurePreset": "ci-windows",
+            "output": {"outputOnFailure": true}
+        },
+        {
+            "name": "ci-linux",
+            "configurePreset": "ci-linux",
+            "output": {"outputOnFailure": true}
+        }
+    ]
+}

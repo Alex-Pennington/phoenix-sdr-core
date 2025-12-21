@@ -1,0 +1,139 @@
+# Phoenix SDR Core - CI Build
+# Builds on Windows (MSYS2) and Linux (GCC)
+# SDRplay API is NOT included - users install separately
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  #============================================================================
+  # Windows Build (MSYS2 UCRT64)
+  #============================================================================
+  build-windows:
+    name: Windows (MSYS2 UCRT64)
+    runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: msys2 {0}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-gcc
+      
+      - name: Configure
+        run: cmake --preset ci-windows
+      
+      - name: Build
+        run: cmake --build --preset ci-windows
+      
+      - name: Test
+        run: ctest --preset ci-windows --output-on-failure
+      
+      - name: Package
+        run: |
+          mkdir -p package
+          cp build/ci-windows/*.exe package/ 2>/dev/null || true
+          cp build/ci-windows/*.dll package/ 2>/dev/null || true
+          cp build/ci-windows/libphoenix_sdr_core.a package/ 2>/dev/null || true
+          cp README.md package/
+          cp LICENSE package/
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phoenix-sdr-core-windows
+          path: package/
+
+  #============================================================================
+  # Linux Build
+  #============================================================================
+  build-linux:
+    name: Linux (GCC)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build gcc
+      
+      - name: Configure
+        run: cmake --preset ci-linux
+      
+      - name: Build
+        run: cmake --build --preset ci-linux
+      
+      - name: Test
+        run: ctest --preset ci-linux --output-on-failure
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phoenix-sdr-core-linux
+          path: |
+            build/ci-linux/*.a
+            build/ci-linux/test_*
+
+  #============================================================================
+  # Release (on tag push)
+  #============================================================================
+  release:
+    name: Create Release
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: phoenix-sdr-core-windows
+          path: windows/
+      
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: phoenix-sdr-core-linux
+          path: linux/
+      
+      - name: Create Archives
+        run: |
+          cd windows && zip -r ../phoenix-sdr-core-windows.zip . && cd ..
+          cd linux && tar -czvf ../phoenix-sdr-core-linux.tar.gz . && cd ..
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            phoenix-sdr-core-windows.zip
+            phoenix-sdr-core-linux.tar.gz
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-rc') }}
