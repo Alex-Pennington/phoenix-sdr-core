@@ -1,0 +1,3 @@
+[submodule "external/kiss_fft"]
+	path = external/kiss_fft
+	url = https://github.com/Alex-Pennington/phoenix-kiss-fft.git

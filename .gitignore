@@ -1,0 +1,36 @@
+# Build output
+build/
+bin/
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SDRplay API (must be installed separately)
+sdrplay_api.dll
+sdrplay_api.lib
+
+# Recordings
+recordings/
+*.iqr
+*.meta
+
+# Temporary files
+*.tmp
+*.bak
+*.log
