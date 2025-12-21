@@ -556,12 +556,11 @@ tcp_error_t tcp_execute_command(
 
         case CMD_SET_AGC: {
             char old_agc[16];
-            strncpy(old_agc, state->agc_mode, sizeof(old_agc) - 1);
-            old_agc[15] = '\0';
-            strncpy(state->agc_mode, cmd->value.agc.mode, sizeof(state->agc_mode) - 1);
+            snprintf(old_agc, sizeof(old_agc), "%s", state->agc_mode);
+            snprintf(state->agc_mode, sizeof(state->agc_mode), "%s", cmd->value.agc.mode);
             hw_err = apply_config_to_hardware(state);
             if (hw_err != TCP_OK) {
-                strncpy(state->agc_mode, old_agc, sizeof(state->agc_mode) - 1);  /* Restore */
+                snprintf(state->agc_mode, sizeof(state->agc_mode), "%s", old_agc);  /* Restore */
                 tcp_response_error(response, hw_err, "hardware update failed");
                 return hw_err;
             }
@@ -635,9 +634,8 @@ tcp_error_t tcp_execute_command(
                 return TCP_ERR_STATE;
             }
             char old_antenna[8];
-            strncpy(old_antenna, state->antenna, sizeof(old_antenna) - 1);
-            old_antenna[7] = '\0';
-            strncpy(state->antenna, cmd->value.antenna.port, sizeof(state->antenna) - 1);
+            snprintf(old_antenna, sizeof(old_antenna), "%s", state->antenna);
+            snprintf(state->antenna, sizeof(state->antenna), "%s", cmd->value.antenna.port);
 
             /* If switching to Hi-Z, clamp LNA state to valid range (0-4) */
             int old_lna = state->lna_state;
@@ -647,7 +645,7 @@ tcp_error_t tcp_execute_command(
 
             hw_err = apply_config_to_hardware(state);
             if (hw_err != TCP_OK) {
-                strncpy(state->antenna, old_antenna, sizeof(state->antenna) - 1);  /* Restore */
+                snprintf(state->antenna, sizeof(state->antenna), "%s", old_antenna);  /* Restore */
                 state->lna_state = old_lna;
                 tcp_response_error(response, hw_err, "hardware update failed");
                 return hw_err;
@@ -719,7 +717,7 @@ tcp_error_t tcp_execute_command(
                 tcp_response_error(response, TCP_ERR_STATE, "stop streaming first");
                 return TCP_ERR_STATE;
             }
-            strncpy(state->if_mode, cmd->value.if_mode, sizeof(state->if_mode) - 1);
+            snprintf(state->if_mode, sizeof(state->if_mode), "%s", cmd->value.if_mode);
             hw_err = apply_config_to_hardware(state);
             if (hw_err != TCP_OK) {
                 tcp_response_error(response, hw_err, "hardware update failed");
