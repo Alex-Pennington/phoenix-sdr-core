@@ -130,8 +130,8 @@ if(SDRplayAPI_FOUND)
     target_link_libraries(phoenix_sdr_core PUBLIC ${SDRplayAPI_LIBRARIES})
     target_compile_definitions(phoenix_sdr_core PUBLIC HAS_SDRPLAY_API)
 else()
-    # Stub mode - use local header copy for compilation
-    target_include_directories(phoenix_sdr_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/sdrplay)
+    # Stub mode - link stub implementations for CI builds
+    target_sources(phoenix_sdr_core PRIVATE src/stubs/sdrplay_api_stub.c)
     target_compile_definitions(phoenix_sdr_core PUBLIC SDRPLAY_STUB_MODE)
 endif()
 
