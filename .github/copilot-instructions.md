@@ -11,7 +11,16 @@
 
 ## Architecture Overview
 
-**Phoenix SDR Core** provides the hardware interface for SDRplay RSP2 Pro, including decimation and TCP control.
+**Phoenix SDR Core** is a static library providing the hardware interface for SDRplay RSP2 Pro, including decimation and TCP control.
+
+**This repository produces:** `phoenix_sdr_core.lib` + headers (NO executables)
+
+**Consumed as a submodule by:**
+- `phoenix-sdr-utils` (SDR applications)
+- `phoenix-sdr-net` (Network SDR tools)
+
+**Dependencies (as submodule):**
+- `phoenix-kiss-fft` (in `external/`)
 
 ### Signal Flow
 ```
@@ -30,7 +39,7 @@ SDRplay RSP2 Pro (USB)
    tcp_commands.c ── Remote control protocol
         │
         ▼
-   TCP Clients (waterfall, analyzers, etc.)
+   Applications (phoenix-sdr-utils, phoenix-sdr-net)
 ```
 
 ### Key Directories
@@ -39,6 +48,7 @@ SDRplay RSP2 Pro (USB)
 | `src/` | Core SDR interface modules |
 | `include/` | Public headers, `phoenix_sdr.h` is main API |
 | `docs/` | Protocol documentation |
+| `external/` | Submodule dependencies (kiss_fft) |
 
 ---
 

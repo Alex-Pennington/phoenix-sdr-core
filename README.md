@@ -8,9 +8,19 @@
 
 ## Overview
 
+**Static library only** — This repository produces `phoenix_sdr_core.lib` and header files, not standalone executables.
+
 Core SDR hardware interface library for the Phoenix Nest MARS Suite. Provides low-level access to SDRplay RSP2 Pro hardware with I/Q streaming, multi-stage decimation, and TCP command interface.
 
 This is the **foundation layer** that other Phoenix SDR tools build upon.
+
+### Integration
+
+This library is designed to be consumed as a **git submodule** by:
+- [phoenix-sdr-utils](https://github.com/Alex-Pennington/phoenix-sdr-utils) — SDR utilities and applications
+- [phoenix-sdr-net](https://github.com/Alex-Pennington/phoenix-sdr-net) — Network-based SDR tools
+
+Alternatively, install system-wide using CMake's install targets (see Installation section below).
 
 ---
 
@@ -246,15 +256,46 @@ This repository uses GitHub Actions for continuous integration. Builds are teste
 
 ---
 
+## Installation
+
+### As a Submodule (Recommended)
+
+In your application repository (e.g., phoenix-sdr-utils):
+
+```bash
+git submodule add https://github.com/Alex-Pennington/phoenix-sdr-core.git external/phoenix-sdr-core
+git submodule update --init --recursive
+```
+
+Then in your `CMakeLists.txt`:
+
+```cmake
+add_subdirectory(external/phoenix-sdr-core)
+target_link_libraries(your_app PRIVATE phoenix_sdr_core)
+```
+
+### System-Wide Install
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build --prefix /usr/local
+```
+
+Headers installed to: `<prefix>/include/phoenix_sdr/`  
+Library installed to: `<prefix>/lib/`
+
+---
+
 ## Related Repositories
 
 | Repository | Description |
 |------------|-------------|
+| [phoenix-sdr-utils](https://github.com/Alex-Pennington/phoenix-sdr-utils) | SDR applications (consumes this library) |
+| [phoenix-sdr-net](https://github.com/Alex-Pennington/phoenix-sdr-net) | Network SDR tools (consumes this library) |
+| [phoenix-kiss-fft](https://github.com/Alex-Pennington/phoenix-kiss-fft) | FFT library (submodule dependency) |
 | [mars-suite](https://github.com/Alex-Pennington/mars-suite) | Phoenix Nest MARS Suite index |
-| [phoenix-kiss-fft](https://github.com/Alex-Pennington/phoenix-kiss-fft) | FFT library (submodule) |
 | [phoenix-reference-library](https://github.com/Alex-Pennington/phoenix-reference-library) | Technical documentation |
-| [phoenix-wwv](https://github.com/Alex-Pennington/phoenix-wwv) | WWV time signal detection |
-| [phoenix-waterfall](https://github.com/Alex-Pennington/phoenix-waterfall) | SDR waterfall display |
 
 ---
 
